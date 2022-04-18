@@ -6,7 +6,7 @@
 
 Cand un trigger este creat, se specifica si cand acesta va fi executat in mod automat. Aceasta executie este asociata cu o anumita operatie care se efectueaza asupra unei tabele sau a unui view, acestea fiind de tip _DML_. Triggerele efectuate asupra unei scheme de baze de date sunt de tip _DDL_, iar cele efectuate asupra intregii bazei de date sunt de tip _system_. 
 
-Impreuna cu tipul operatiei ce va lansa in executie trigerul, se specifica si cand se doreste executarea acestuia: de exemplu, daca vrem sa facem o operatie de stergere dintr-o tabela si dorim ca valoarea ce este stearsa sa fie copiata intr-o alta tabela de bkup, este firesc ca sa dorim executarea triggerului inainte ca stergerea efectiva sa fie efectuata - in acest fel aveam acces la valoarea ce va fi stearsa si putem sa o copiem in tabela de bkup.
+> de exemplu, daca vrem sa facem o operatie de stergere dintr-o tabela si dorim ca valoarea ce este stearsa sa fie copiata intr-o alta tabela de bkup, este firesc ca sa dorim executarea triggerului inainte ca stergerea efectiva sa fie efectuata - in acest fel aveam acces la valoarea ce va fi stearsa si putem sa o copiem in tabela de bkup.
 
 Acestea sunt motivele pentru care am dori sa utilizam un trigger:
 
