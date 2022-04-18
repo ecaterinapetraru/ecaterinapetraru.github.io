@@ -75,8 +75,9 @@ si executand apoi:
 ```
 update studenti set nume='NumeNou' where id=200;
 ```
-=========================================================================================================
-###Aparitia erorilor de tip Mutating Table
+==========================================================================================
+
+### Aparitia erorilor de tip Mutating Table
 
 
 
