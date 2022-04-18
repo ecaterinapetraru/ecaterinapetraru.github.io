@@ -40,7 +40,6 @@ BEGIN
      WHEN INSERTING THEN DBMS_OUTPUT.PUT_LINE('INSERT');
      WHEN DELETING THEN DBMS_OUTPUT.PUT_LINE('DELETE');
      WHEN UPDATING THEN DBMS_OUTPUT.PUT_LINE('UPDATE');
-     -- WHEN UPDATING('NUME') THEN .... // vedeti mai jos trigere ce se executa doar la modificarea unui anumit camp
   END CASE;
 END;
 /
