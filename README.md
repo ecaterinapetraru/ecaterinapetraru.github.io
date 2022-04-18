@@ -75,6 +75,11 @@ si executand apoi:
 ```
 update studenti set nume='NumeNou' where id=200;
 ```
+=========================================================================================================
+###Aparitia erorilor de tip Mutating Table
+
+
+
 
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
