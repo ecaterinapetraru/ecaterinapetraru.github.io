@@ -99,6 +99,7 @@ si executand apoi:
 ```
 update studenti set nume='NumeNou' where id=200;
 ```
+
 =================================================================================
 
 ### Aparitia erorilor de tip Mutating Table
@@ -120,6 +121,9 @@ begin
    select count(*) into v_ramase from note;
    dbms_output.put_line('Au ramas '|| v_ramase || ' note.');
 end;
+/
+delete from note where id between 101 and 110;
+/
 ```
 In momentul in care o exceptie este aruncata, nici modificarea din DML nu va avea loc. 
 
@@ -143,14 +147,101 @@ COMPOUND TRIGGER
      dbms_output.put_line('Au ramas '|| v_ramase || ' note.');  
   END AFTER STATEMENT ;
 END stergere_note;
+
+delete from note where id between 241 and 250;
 ```
 
+### Triggere de tipul instead of
 
+Acest trigger se defineste numai pe view-uri, nu si pe tabele. Unele view-uri nu pot fi modificate prin comenzi DML, dar folosind un trigger cu opțiunea `INSTEAD OF` acest lucru este realizabil.
 
+View-urile care nu pot fi modificate prin comenzile `UPDATE`, `INSERT` sau `DELETE` sunt cele create printr-o interogare care conține în construcție:
+- Un operator `SET` sau `DISTINCT`
+- Clauzele `GROUP BY`, `ORDER BY`, `CONNECT BY` sau `START WITH`
+- O expresie tip colectie într-o clauza `SELECT`
+- O subcerere într-o clauza `SELECT`
 
+Datorita existentei triggerelor acum putem sterge cu usurinta un obiect, triggerul avand rolul de a sterge toate informatiile din tabelele aditionale.
+_exemplu:_
+```
+create view std as select * from studenti;
 
+CREATE OR REPLACE TRIGGER delete_student
+  INSTEAD OF delete ON std
+BEGIN
+  dbms_output.put_line('Stergem pe:' || :OLD.nume);
+  delete from note where id_student=:OLD.id;
+  delete from prieteni where id_student1=:OLD.id;
+  delete from prieteni where id_student2=:OLD.id;
+  delete from studenti where id=:OLD.id;
+END;
 
+delete from std where id=75;
+```
 
+=================================================================================
+
+### Triggere DDL
+
+Din punctul de vedere al momentului cand sunt executate, triggerele de sistem pot fi de tipul `BEFORE`, `AFTER` sau `INSTEAD`.
+
+Din punctul de vedere al evenimentului ce poate fi tratat, pot fi triggere ce au loc cand este modificata schema de baze de date sau de tipul `INSTEAD OF CREATE`.
+
+Sintaxa:
+```
+CREATE [OR REPLACE] TRIGGER nume_trigger
+[ddl_event1 [OR ddl_event2 OR ddl_event3...]] 
+ON {DATABASE|SCHEMA} -- se aplica la nivel de baza de date sau la nivel de user [DECLARE ...] 
+BEGIN 
+...
+END 
+```
+
+_exemplu:_
+```
+CREATE OR REPLACE TRIGGER drop_trigger
+  BEFORE DROP ON student.SCHEMA
+  BEGIN
+    RAISE_APPLICATION_ERROR (
+      num => -20000,
+      msg => 'can''t touch this');
+  END;
+/
+
+DROP TABLE NOTE;
+```
+
+Alte operatii `DDL` pe care se pot realiza triggere sunt:
+- BEFORE OR AFTER:
+- ALTER
+- DROP (!!) OR ANALYZE
+- ASSOCIATE OR STATISTICS OR AUDIT/NOAUDIT OR COMMENT
+- CREATE OR DDL OR DISASSOCIATE STATISTICS
+- GRANT OR RENAME OR REVOKE OR TRUNCATE
+- AFTER SUSPEND OR LOGOFF 
+- BEFORE FORELOGON
+
+Lista tuturor trigerelor de tip `DDL` poate fi consultata <a href="https://docs.oracle.com/cd/E11882_01/appdev.112/e25519/triggers.htm#CHDGIJDB">aici</a>.
+
+### Triggere Sistem
+
+Pe langa triggerele pentru operatii de tip DDL mai exista 2 tipuri de triggere prin intermediul carora puteti obtine informatii despre evenimentele intamplate in sistem.
+
+Un exemplu ar putea fi, stocarea intr-un tabel a utilizatorilor si orele la care acestia se autentifica.
+```
+create table autentificari(nume varchar2(30), ora timestamp);
+/
+CREATE OR REPLACE TRIGGER check_user
+  AFTER LOGON ON DATABASE
+DECLARE
+  v_nume VARCHAR2(30);
+BEGIN
+  v_nume := ora_login_user;
+  INSERT INTO autentificari VALUES(v_nume, CURRENT_TIMESTAMP);
+END;
+/
+```
+Atunci cand nu mai aveti nevoie de triggere, puteti sa le eliminati cu drop trigger urmata de numele triggerului pe care doriti sa il eliminati.
 
 
 
