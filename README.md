@@ -147,8 +147,9 @@ COMPOUND TRIGGER
      dbms_output.put_line('Au ramas '|| v_ramase || ' note.');  
   END AFTER STATEMENT ;
 END stergere_note;
-
+/
 delete from note where id between 241 and 250;
+/
 ```
 
 ### Triggere de tipul instead of
