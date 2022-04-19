@@ -103,9 +103,47 @@ update studenti set nume='NumeNou' where id=200;
 
 ### Aparitia erorilor de tip Mutating Table
 
+În momentul în care se dorește executarea unei operații DML care implicit execută un trigger, acest trigger nu are permisiunea să citească date din tabela în curs de modificare. Încercarea de a realiza un select asupra tabelei va genera o eroare de tipul Mutating table (ORA-04091).
 
+Există două metode pentru a evita aceste erori:
+- Utilizarea triggerilor compusi (compunerea celor 4 tipuri de trigere disponibile: `BEFORE`, `BEFORE EACH ROW`, `AFTER EACH ROW` si `AFTER`).
+- Utilizarea unei tabele temporare
 
+_exemplu_:
+```
+create or replace trigger mutate_example
+after delete on note for each row
+declare 
+   v_ramase int;
+begin
+   dbms_output.put_line('Stergere nota cu ID: '|| :OLD.id);
+   select count(*) into v_ramase from note;
+   dbms_output.put_line('Au ramas '|| v_ramase || ' note.');
+end;
+```
+In momentul in care o exceptie este aruncata, nici modificarea din DML nu va avea loc. 
 
+Solutia pentru problema anterioara este sa construim un trigger care sa afiseze doar la sfarsit numarul de linii ramase (numai triggerele de tipul "for each row" vor crea mutating table).
+
+```
+set serveroutput on;
+
+CREATE OR REPLACE TRIGGER stergere_note 
+FOR DELETE ON NOTE
+COMPOUND TRIGGER
+  v_ramase INT;
+  
+  AFTER EACH ROW IS 
+  BEGIN
+     dbms_output.put_line('Stergere nota cu ID: '|| :OLD.id);
+  END AFTER EACH ROW;
+  
+  AFTER STATEMENT IS BEGIN
+     select count(*) into v_ramase from note;
+     dbms_output.put_line('Au ramas '|| v_ramase || ' note.');  
+  END AFTER STATEMENT ;
+END stergere_note;
+```
 
 
 
